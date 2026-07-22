@@ -101,25 +101,39 @@ def step_overrides() -> None:
 
 
 def step_venv(with_browser: bool) -> None:
+    uv = shutil.which("uv")
     if not venv_python().exists():
-        print("...  creating .venv")
-        r = run([sys.executable, "-m", "venv", str(VENV)])
+        print("...  creating .venv" + (" (via uv)" if uv else ""))
+        if uv:
+            r = run([uv, "venv", str(VENV), "--seed"])
+        else:
+            # Some Pythons (uv-managed, Debian without python3-venv) lack ensurepip.
+            r = run([sys.executable, "-m", "venv", str(VENV)])
         if r.returncode != 0:
-            sys.exit(f"{FAIL} venv creation failed:\n{r.stderr}")
+            sys.exit(
+                f"{FAIL} venv creation failed:\n{(r.stderr or r.stdout)[-1500:]}\n\n"
+                "Your Python likely lacks venv/ensurepip. Easiest fixes:\n"
+                "  - install uv (https://docs.astral.sh/uv) and re-run — setup will use it, or\n"
+                "  - Debian/Ubuntu: sudo apt install python3-venv, or\n"
+                "  - install Python 3.12 from python.org and re-run with it."
+            )
     py = str(venv_python())
     print("...  installing dependencies (a few minutes on first run)")
-    run([py, "-m", "pip", "install", "--upgrade", "pip", "--quiet"])
-    r = run([py, "-m", "pip", "install", "--quiet",
-             "-e", str(ARENA) + "[openai,ollama,faiss,networkx,science,tavily]",
-             "fastapi", "uvicorn[standard]", "httpx", "playwright"])
+    deps = ["-e", str(ARENA) + "[openai,ollama,faiss,networkx,science,tavily]",
+            "fastapi", "uvicorn[standard]", "httpx", "playwright"]
+    if uv:
+        r = run([uv, "pip", "install", "--quiet", "--python", py, *deps])
+    else:
+        run([py, "-m", "pip", "install", "--upgrade", "pip", "--quiet"])
+        r = run([py, "-m", "pip", "install", "--quiet", *deps])
     if r.returncode != 0:
-        sys.exit(f"{FAIL} pip install failed:\n{r.stderr[-3000:]}")
+        sys.exit(f"{FAIL} dependency install failed:\n{(r.stderr or r.stdout)[-3000:]}")
     print(f"{OK} dependencies installed into .venv")
     if with_browser:
         print("...  installing Playwright Chromium for BrowserAgent (~130 MB; --no-browser to skip)")
         r = run([py, "-m", "playwright", "install", "chromium"])
         print(f"{OK} Chromium installed" if r.returncode == 0
-              else f"{WARN} Chromium install failed — only the BrowserAgent card is affected:\n{r.stderr[-500:]}")
+              else f"{WARN} Chromium install failed — only the BrowserAgent card is affected:\n{(r.stderr or r.stdout)[-500:]}")
 
 
 def step_embed_model() -> None:
