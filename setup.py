@@ -34,7 +34,9 @@ OK, WARN, FAIL = "[ ok ]", "[warn]", "[FAIL]"
 
 
 def run(cmd: list[str], **kw) -> subprocess.CompletedProcess:
-    return subprocess.run(cmd, text=True, capture_output=True, **kw)
+    # utf-8 + replace: child output (git/uv progress bars) must never crash the reader
+    return subprocess.run(cmd, text=True, capture_output=True,
+                          encoding="utf-8", errors="replace", **kw)
 
 
 def venv_python() -> Path:
