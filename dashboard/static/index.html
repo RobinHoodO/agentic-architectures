@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agentic Architectures Arena</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#129504;</text></svg>">
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <div class="t1">AGENTIC ARCHITECTURES <em>ARENA</em></div>
+    <div class="t2">35 patterns &middot; live on your Codex CLI subscription &middot; embeddings by local Ollama</div>
+  </div>
+  <div class="stats">
+    <div class="stat"><b id="s-calls">0</b><span>LLM calls</span></div>
+    <div class="stat"><b id="s-flight">0</b><span>in flight</span></div>
+    <div class="stat"><b id="s-avg">&ndash;</b><span>avg s/call</span></div>
+    <div class="stat"><b id="s-pass">0/36</b><span>tested&nbsp;ok</span></div>
+  </div>
+  <select id="model" title="Codex model">
+    <option value="gpt-5.3-codex-spark" selected>spark (fast)</option>
+    <option value="gpt-5.6-sol">sol (smart)</option>
+  </select>
+  <select id="effort" title="Reasoning effort">
+    <option value="none">effort: none</option>
+    <option value="low" selected>effort: low</option>
+    <option value="medium">effort: medium</option>
+  </select>
+  <button class="primary" id="runall">&#9654; RUN ALL 35</button>
+</header>
+
+<div id="layout">
+  <div id="catalog"></div>
+
+  <aside id="drawer">
+    <div class="dhead">
+      <div class="row1">
+        <span class="bignum" id="d-num">01</span>
+        <h3 id="d-name">Reflection</h3>
+        <span class="chip" id="d-fam">Family</span>
+        <button class="close" id="d-close" title="Close">&times;</button>
+      </div>
+      <div class="meta"><span id="d-pattern"></span> &middot; <span id="d-ref"></span></div>
+    </div>
+    <div class="dbody">
+      <div id="explainbox">
+        <div id="d-explain"></div>
+        <div id="d-usewhen"></div>
+      </div>
+      <div>
+        <h4>Task</h4>
+        <textarea id="task" spellcheck="false"></textarea>
+        <div class="runrow" style="margin-top:8px">
+          <button class="primary" id="runbtn">&#9654; RUN</button>
+          <button id="stopbtn" style="display:none">&#9632; STOP</button>
+          <span id="runstate" class="dim" style="color:var(--dim);font-size:12px"></span>
+          <span class="spacer"></span>
+          <span id="verdict"></span>
+        </div>
+      </div>
+      <div>
+        <h4>Live graph <span id="gsub" style="text-transform:none;letter-spacing:0;color:#58627599">(click a node for its prompts &amp; outputs)</span></h4>
+        <div id="graphwrap"><svg id="graph" width="620" height="120"></svg></div>
+      </div>
+      <div id="wssection" style="display:none">
+        <h4 id="wstitle">Workspace</h4>
+        <div id="wsbody"></div>
+      </div>
+      <div id="kgsection" style="display:none">
+        <h4>Knowledge graph <span style="text-transform:none;letter-spacing:0;color:#58627599">(entities &amp; triples this run built — drag nodes, wheel to zoom)</span></h4>
+        <div id="kgwrap"><svg id="kgsvg"></svg></div>
+        <div id="kglegend"></div>
+      </div>
+      <div>
+        <h4>Event feed</h4>
+        <div id="feed"></div>
+      </div>
+      <div>
+        <h4>Output</h4>
+        <div id="output" class="dim">&mdash;</div>
+        <div id="metachips" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div id="sweepbar">
+  <b style="font-size:12.5px;letter-spacing:.08em">SWEEP</b>
+  <div id="sweepdots"></div>
+  <span id="sweepsum"></span>
+  <button id="sweepcancel">Stop</button>
+</div>
+
+<div id="nodemodal" class="nm-hidden">
+  <div class="nm-box">
+    <div class="nm-head">
+      <b id="nm-title">node</b>
+      <span id="nm-sub"></span>
+      <button id="nm-close" title="Close">&times;</button>
+    </div>
+    <div class="nm-body" id="nm-body"></div>
+  </div>
+</div>
+
+<footer>agentic-architectures 0.3.0 (FareedKhan-dev) &middot; bridge: codex exec &rarr; OpenAI-compatible /v1</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

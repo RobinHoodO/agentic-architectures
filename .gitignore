@@ -1,0 +1,10 @@
+# local state — everything regenerable
+.venv/
+arena/
+results/
+logs/
+.codex-scratch/
+.sandbox/
+__pycache__/
+*.pyc
+.env
