@@ -6,6 +6,12 @@ Click a pattern → read a plain-English explainer of what it actually does → 
 
 Built by [The AI Automators](https://www.theaiautomators.com/) for our video on the agentic design-pattern canon. The pattern implementations come from [**FareedKhan-dev/all-agentic-architectures**](https://github.com/FareedKhan-dev/all-agentic-architectures) — this repo is a teaching harness around that excellent library (see [How this uses the base repo](#how-this-uses-the-base-repo)).
 
+![The Arena board — all 35 patterns swept green on a ChatGPT subscription](docs/arena-board.png)
+
+| Live annotated graph + explainer (Tree of Thoughts) | Knowledge-graph viewer (GraphRAG) |
+|---|---|
+| ![TreeOfThoughts drawer: explainer, live generate→score→prune loop with call badges](docs/arena-drawer.png) | ![GraphRAG: flow graph plus the knowledge graph it built, communities coloured](docs/arena-kg.png) |
+
 ## What makes it interesting
 
 - **$0 API spend.** LLM calls are served by an OpenAI-compatible bridge that shells out to the **OpenAI Codex CLI** — each call runs on the ChatGPT plan you already pay for. Embeddings run locally via **Ollama**. Web-search tools use Codex's built-in search (no Tavily key).
