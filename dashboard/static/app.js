@@ -11,6 +11,7 @@ let currentRunId = null;
 let viewRunId = null;  // run whose trace the drawer currently shows
 let viewCalls = null;  // cached call details for finished/history runs
 let graphState = { nodes: [], edges: [], pos: {} };
+let lastGraphJson = null;  // last topology drawn — reused to reset the graph on re-run
 let nodeStats = {};   // node -> {visits, calls, seconds}
 let edgeCounts = {};  // "from→to" -> traversal count
 let lastNode = null;
@@ -181,6 +182,11 @@ $("runbtn").onclick = async () => {
   $("metachips").innerHTML = "";
   $("verdict").textContent = "";
   $("verdict").className = "";
+  // a re-run starts from a clean slate: previous KG/workspace go, graph resets to topology
+  hideKG();
+  hideWorkspace();
+  viewCalls = null;
+  if (lastGraphJson) drawGraph(lastGraphJson);
   const r = await fetch("/api/run", {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
   });
@@ -468,18 +474,32 @@ function hideWorkspace() {
   $("wsbody").innerHTML = "";
 }
 
+const CELL_COLORS = { tree: "#43b97f", fire: "#e8763d", ash: "#8a9bb0", empty: "#232936" };
+
 function renderWorkspace(ws) {
   if (!ws || !ws.items || !ws.items.length) { hideWorkspace(); return; }
   $("wssection").style.display = "";
   $("wstitle").innerHTML = `Workspace <span style="text-transform:none;letter-spacing:0;color:#58627599">${esc(ws.title || "")} · ${ws.items.length} item(s)</span>`;
-  $("wsbody").innerHTML = ws.items.map((it) => `
+  $("wsbody").innerHTML = ws.items.map((it) => {
+    let body;
+    if (it.grid) {
+      body = `<div class="ws-grid">` + it.grid.map((row) =>
+        `<div class="ws-gridrow">` + row.map((cell) => {
+          const c = CELL_COLORS[String(cell).toLowerCase()] || "#4a9eed";
+          return `<span class="ws-cell" style="background:${c}" title="${esc(cell)}"></span>`;
+        }).join("") + `</div>`).join("") + `</div>`;
+    } else {
+      body = `<pre class="ws-pre${it.code ? " ws-code" : ""}">${esc(pretty(it.content || ""))}</pre>`;
+    }
+    return `
     <div class="ws-item">
       <div class="ws-head">
         <span class="ws-tag">${esc(it.tag || "")}</span>
         ${it.label ? `<b>${esc(it.label)}</b>` : ""}
       </div>
-      <pre class="ws-pre${it.code ? " ws-code" : ""}">${esc(it.content || "")}</pre>
-    </div>`).join("");
+      ${body}
+    </div>`;
+  }).join("");
 }
 
 /* ---------------- knowledge-graph viewer (networkx archs) ---------------- */
@@ -620,7 +640,8 @@ function drawGraph(graph) {
     <path d="M 0 0 L 10 5 L 0 10 z" fill="#485060"/></marker></defs>`;
   $("gsub").textContent = graph ? "(click a node for its prompts & outputs)" : "(loading topology…)";
   nodeStats = {}; edgeCounts = {}; lastNode = null; activeNode = null;
-  if (!graph) { graphState = { nodes: [], edges: [], pos: {} }; svg.setAttribute("height", 40); return; }
+  if (!graph) { graphState = { nodes: [], edges: [], pos: {} }; lastGraphJson = null; svg.setAttribute("height", 40); return; }
+  lastGraphJson = graph;
 
   // BFS layering from __start__
   const ids = graph.nodes.map((n) => n.id);
@@ -736,11 +757,22 @@ $("runall").onclick = async () => {
     body: JSON.stringify({ model: $("model").value, effort: $("effort").value }),
   });
   if (!r.ok) { const e = await r.json(); alert(e.error || "sweep failed to start"); return; }
+  $("sweepbar").dataset.closed = "0";
   $("sweepbar").classList.add("on");
 };
 
 $("sweepcancel").onclick = async () => {
   await fetch("/api/sweep/cancel", { method: "POST" });
+};
+
+$("sweepmin").onclick = () => {
+  const min = $("sweepbar").classList.toggle("min");
+  $("sweepmin").innerHTML = min ? "&#9652;" : "&#9662;";
+};
+
+$("sweepclose").onclick = () => {
+  $("sweepbar").dataset.closed = "1";
+  $("sweepbar").classList.remove("on");
 };
 
 async function pollStatus() {
@@ -754,10 +786,13 @@ async function pollStatus() {
     for (const [cls, run] of Object.entries(st.runs)) {
       if (run.status === "running") setDot(cls, "running", `running · ${run.seconds}s · ${run.llm_calls} calls`);
     }
-    // sweep bar
+    // sweep bar (collapsible via ▾, dismissible via ×; a new sweep re-opens it)
+    const bar = $("sweepbar");
     const sweeping = st.sweep.active;
-    $("sweepbar").classList.toggle("on", sweeping || $("sweepbar").dataset.linger === "1");
-    if (sweeping) $("sweepbar").dataset.linger = "1";
+    if (sweeping && !window._sweepWasActive) bar.dataset.closed = "0";
+    window._sweepWasActive = sweeping;
+    bar.classList.toggle("on", (sweeping || bar.dataset.linger === "1") && bar.dataset.closed !== "1");
+    if (sweeping) bar.dataset.linger = "1";
     if ($("sweepbar").classList.contains("on")) {
       const dots = $("sweepdots");
       if (!dots.childElementCount) {

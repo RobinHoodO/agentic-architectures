@@ -763,6 +763,31 @@ def _extract_workspace(arch_name: str, arch, result) -> dict | None:
             for e in list(tier or []):
                 items.append({"tag": "in-context", "label": "", "content": str(e)})
             return {"title": "Core context tier — what stayed in the window", "items": items} if items else None
+        if arch_name == "CellularAutomata" and result is not None:
+            for t in (result.trace or []):
+                if t.get("type") == "grid" and t.get("grid"):
+                    items.append({"tag": f"step {t.get('step')}", "label": "", "grid": t["grid"]})
+            return {"title": "Grid evolution — every cell is an LLM agent", "items": items} if items else None
+        # Generic fallback: surface the run's trace entries (candidate thoughts, votes,
+        # debate positions, verification Q&A, plan steps, safety verdicts, ...)
+        if result is not None and result.trace:
+            content_keys = ("content", "thought", "answer", "sample", "position", "critique",
+                            "question", "text", "summary", "proposal", "verdict", "reason", "steps")
+            for t in list(result.trace)[:40]:
+                if not isinstance(t, dict):
+                    continue
+                body = next((t[k] for k in content_keys if isinstance(t.get(k), str) and t[k].strip()), None)
+                if body is None:
+                    rest = {k: v for k, v in t.items() if k not in ("type", "stage")}
+                    if not rest:
+                        continue
+                    body = json.dumps(_jsonable(rest), indent=1)[:1500]
+                tag = str(t.get("type") or t.get("stage") or "entry")
+                label_bits = [str(t[k]) for k in ("agent", "name", "round", "depth", "score", "id")
+                              if t.get(k) is not None]
+                items.append({"tag": tag, "label": " · ".join(label_bits[:3]), "content": str(body)[:2000]})
+            return {"title": "Run artifacts — what the pattern produced along the way",
+                    "items": items} if items else None
         return None
     except Exception:
         return None

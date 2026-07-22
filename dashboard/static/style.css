@@ -229,6 +229,14 @@ textarea#task { width: 100%; min-height: 74px; resize: vertical; font-size: 13px
 }
 #sweepsum { font-size: 12.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
 #sweepsum b { color: var(--text); }
+#sweepmin, #sweepclose { padding: 3px 9px; font-size: 13px; line-height: 1; }
+#sweepbar.min { left: auto; right: 14px; border: 1px solid var(--line); border-radius: 10px 10px 0 0; padding: 5px 12px; }
+#sweepbar.min #sweepdots, #sweepbar.min #sweepcancel { display: none; }
+
+/* workspace grid (cellular automata) */
+.ws-grid { padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.ws-gridrow { display: flex; gap: 3px; }
+.ws-cell { width: 22px; height: 22px; border-radius: 4px; display: inline-block; }
 
 footer {
   position: fixed; right: 14px; bottom: 8px; color: #58627566; font-size: 10.5px; z-index: 5;
