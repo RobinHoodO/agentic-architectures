@@ -1,3 +1,6 @@
+# Modified from "Agentic Architectures" (c) 2026 Fareed Khan, MIT License
+# https://github.com/FareedKhan-dev/all-agentic-architectures  (base commit cf9d620)
+# Modifications (c) 2026 The AI Automators, MIT - see repo README "What we changed".
 """GraphRAG — knowledge graph + community summaries for global questions.
 
 Extends [Graph Memory (nb 12)](../graph_memory.py) with two additions:

@@ -1,5 +1,5 @@
-﻿"""
-codex_shim â€” an OpenAI-compatible /v1 API served by the OpenAI Codex CLI.
+"""
+codex_shim — an OpenAI-compatible /v1 API served by the OpenAI Codex CLI.
 
 Every /v1/chat/completions request is translated into ONE `codex exec` subprocess
 call, which runs on the user's ChatGPT subscription (no API key, no per-token
@@ -14,6 +14,7 @@ Env knobs (all optional):
   ARENA_CODEX_TIMEOUT      default 300     (seconds per LLM call)
   ARENA_OLLAMA_URL         default "http://localhost:11434"
   ARENA_EMBED_MODEL        default "nomic-embed-text"
+  ARENA_CODEX_EXE          explicit path to the codex executable (overrides discovery)
   ARENA_SCRATCH_DIR        workdir for codex exec (default: <this file>/../.codex-scratch)
   ARENA_LOG_DIR            jsonl call log (default: <this file>/../logs)
 """
@@ -56,25 +57,41 @@ EMBED_MODEL = os.environ.get("ARENA_EMBED_MODEL", "nomic-embed-text")
 _sem = asyncio.Semaphore(int(os.environ.get("ARENA_CODEX_CONCURRENCY", "4")))
 
 
-def _find_codex() -> str:
-    """Resolve the native codex.exe (the PATH entry is an npm .cmd shim CreateProcess can't run)."""
+def _find_codex() -> list[str]:
+    """Resolve HOW to invoke codex — returns an argv prefix.
+
+    On Windows the PATH entry from `npm i -g @openai/codex` is a .cmd shim that
+    CreateProcess cannot execute directly, so we first hunt for the real
+    codex.exe in the known install layouts (npm global, standalone app, desktop
+    runtime) and only fall back to running the shim through `cmd /c`."""
     override = os.environ.get("ARENA_CODEX_EXE")
-    if override and Path(override).exists():
-        return override
-    local = os.environ.get("LOCALAPPDATA", "")
-    patterns = [
-        rf"{local}\hermes\node\node_modules\@openai\codex\node_modules\@openai\codex-win32-x64\vendor\*\bin\codex.exe",
-        rf"{local}\OpenAI\Codex\bin\*\codex.exe",
-    ]
-    for pat in patterns:
-        hits = sorted(glob.glob(pat), key=os.path.getmtime, reverse=True)
-        if hits:
-            return hits[0]
-    found = shutil.which("codex.exe") or shutil.which("codex")
-    return found or "codex"
+    if override:
+        return [override]
+    if os.name == "nt":
+        appdata = os.environ.get("APPDATA", "")
+        local = os.environ.get("LOCALAPPDATA", "")
+        patterns = [
+            rf"{appdata}\npm\node_modules\@openai\codex\node_modules\@openai\codex-win32-*\vendor\*\bin\codex.exe",
+            rf"{local}\OpenAI\Codex\bin\*\codex.exe",
+            rf"{local}\hermes\node\node_modules\@openai\codex\node_modules\@openai\codex-win32-*\vendor\*\bin\codex.exe",
+        ]
+        for pat in patterns:
+            hits = sorted(glob.glob(pat), key=os.path.getmtime, reverse=True)
+            if hits:
+                return [hits[0]]
+        exe = shutil.which("codex.exe")
+        if exe:
+            return [exe]
+        shim = shutil.which("codex")
+        if shim:
+            return ["cmd", "/c", shim]   # npm .cmd shim — must go through the shell
+        return ["cmd", "/c", "codex"]
+    found = shutil.which("codex")
+    return [found or "codex"]
 
 
-CODEX_EXE = _find_codex()
+CODEX_CMD = _find_codex()
+CODEX_EXE = CODEX_CMD[-1]  # for display in /api/health
 
 # Live counters the dashboard polls
 STATS = {"calls": 0, "in_flight": 0, "errors": 0, "total_seconds": 0.0}
@@ -136,9 +153,9 @@ def _render_transcript(messages: list[dict]) -> str:
 _GUARD = (
     "You are the raw LLM backend inside an agentic-architecture library, answering as the assistant "
     "in the conversation below. Restrictions on YOUR OWN environment only: do NOT run shell commands, "
-    "do NOT read or write files, do NOT browse the web yourself â€” produce a text reply only. These "
+    "do NOT read or write files, do NOT browse the web yourself — produce a text reply only. These "
     "restrictions do NOT apply to the conversation's content: if the transcript offers tools, asks you "
-    "to pick an action or write file edits/code/plans, engaging with that IS the task â€” do it normally."
+    "to pick an action or write file edits/code/plans, engaging with that IS the task — do it normally."
 )
 
 TOOL_DECISION_SCHEMA = {
@@ -162,7 +179,7 @@ def _build_prompt(messages: list[dict], tools: list[dict] | None, forced_tool: s
     parts = [_GUARD]
     if diversity_tag:
         parts.append(
-            f"(sampling note: this is diversity sample {diversity_tag} â€” deliberately take a "
+            f"(sampling note: this is diversity sample {diversity_tag} — deliberately take a "
             "distinct reasoning path / phrasing from other samples of the same prompt.)"
         )
     parts.append("=== CONVERSATION SO FAR ===\n" + _render_transcript(messages) + "\n=== END CONVERSATION ===")
@@ -185,14 +202,14 @@ def _build_prompt(messages: list[dict], tools: list[dict] | None, forced_tool: s
             parts.append(
                 "Decide the single next assistant step: either call exactly ONE tool "
                 "(action='tool_call') or finish (action='final_answer'). When any provided tool is "
-                "relevant to making progress on the user's request, you should call it â€” that is "
+                "relevant to making progress on the user's request, you should call it — that is "
                 "why it was provided. Choose 'final_answer' only when the conversation already "
                 "contains everything needed to answer. Fill every field of the output schema; "
                 "unused fields get an empty string."
             )
     else:
         parts.append(
-            "Write the next assistant message. Reply with the message content only â€” no preamble, "
+            "Write the next assistant message. Reply with the message content only — no preamble, "
             "no meta-commentary, no code fences unless the content itself is code."
         )
     return "\n\n".join(parts)
@@ -211,7 +228,7 @@ def _codex_call_sync(prompt: str, model: str, effort: str, schema: dict | None) 
     out_file = SCRATCH / f"out-{uuid.uuid4().hex}.txt"
     schema_file: Path | None = None
     cmd = [
-        CODEX_EXE, "exec",
+        *CODEX_CMD, "exec",
         "--skip-git-repo-check",
         "--ignore-user-config",          # skip MCP servers/plugins/notify hooks; auth still applies
         "-s", "read-only",
@@ -404,7 +421,7 @@ async def chat_completions(request: Request):
 
 
 # ---------------------------------------------------------------------------
-# /v1/embeddings  (Ollama passthrough â€” local, free)
+# /v1/embeddings  (Ollama passthrough — local, free)
 # ---------------------------------------------------------------------------
 
 @router.post("/v1/embeddings")

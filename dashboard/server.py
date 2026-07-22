@@ -50,7 +50,7 @@ if static_dir.is_dir():
 
 def _disable_quickedit() -> None:
     """Windows console QuickEdit pauses the process when the user clicks the window —
-    reads as a fake crash. Disable it for this console (same fix as video-editor)."""
+    reads as a fake crash. Disable QuickEdit for this console."""
     if os.name != "nt":
         return
     try:

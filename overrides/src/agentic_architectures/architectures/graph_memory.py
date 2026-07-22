@@ -1,3 +1,6 @@
+# Modified from "Agentic Architectures" (c) 2026 Fareed Khan, MIT License
+# https://github.com/FareedKhan-dev/all-agentic-architectures  (base commit cf9d620)
+# Modifications (c) 2026 The AI Automators, MIT - see repo README "What we changed".
 """Graph Memory — knowledge-graph world model with traversal-based Q&A.
 
 Builds a knowledge graph of (subject, predicate, object) triples extracted from

@@ -1,3 +1,6 @@
+# Modified from "Agentic Architectures" (c) 2026 Fareed Khan, MIT License
+# https://github.com/FareedKhan-dev/all-agentic-architectures  (base commit cf9d620)
+# Modifications (c) 2026 The AI Automators, MIT - see repo README "What we changed".
 """Tree of Thoughts — beam-search over a tree of LLM-generated reasoning steps.
 
 Instead of taking one greedy reasoning step at a time (CoT), ToT generates

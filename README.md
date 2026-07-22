@@ -17,9 +17,9 @@ Built by [The AI Automators](https://www.theaiautomators.com/) for our video on 
 
 | Requirement | Notes |
 |---|---|
-| **Python 3.10+** (3.12 recommended) | `python --version` |
+| **Python 3.10–3.13** (3.12 tested) | `python --version` — 3.14+ is blocked by setup until wheels catch up |
 | **git** | used to clone the base library |
-| **[OpenAI Codex CLI](https://developers.openai.com/codex/cli)** logged in with a ChatGPT plan | `npm i -g @openai/codex` (or the installer), then `codex login`. Tested with codex-cli **0.144**; needs a version with `--output-schema` and `--ignore-user-config`. |
+| **[OpenAI Codex CLI](https://developers.openai.com/codex/cli)** logged in with a ChatGPT plan | `npm i -g @openai/codex` (or the standalone installer), then `codex login`. Tested with codex-cli **0.144.x** — the bridge uses `--output-schema`, `--ephemeral`, `--ignore-user-config`, `-o`, `-s read-only`, `--skip-git-repo-check` and `-c tools.web_search=true`; if a future codex changes these, install 0.144. |
 | **[Ollama](https://ollama.com)** running locally | needed by the 9 RAG/memory patterns for embeddings (the other 27 work without it). Setup pulls the small `nomic-embed-text` model (~270 MB). |
 | OS | Windows 10/11, macOS, or Linux. Tested end-to-end on Windows 11; macOS/Linux use `setup.py` + `start.sh`. |
 | Disk / network | ~2 GB for the venv + Chromium; first setup downloads packages. |
@@ -34,14 +34,14 @@ cd agentic-architectures
 python setup.py
 ```
 
-(`python3 setup.py` on macOS/Linux. Add `--no-browser` to skip the ~130 MB Chromium download — only the BrowserAgent card needs it.)
+(`python3 setup.py` on macOS/Linux; `py setup.py` if `python` isn't on PATH on Windows. Add `--no-browser` to skip the ~130 MB Chromium download — only the BrowserAgent card needs it.)
 
 Setup checks your prerequisites, clones the base library into `arena/` at a pinned commit, applies our teaching patches, builds `.venv`, and pulls the embedding model. It prints `[FAIL]` / `[warn]` lines telling you exactly what to fix; it is safe to re-run.
 
 **Start the dashboard:**
 
 - **Windows:** double-click `Start-Arena.bat`
-- **macOS/Linux:** `./start.sh` (first time: `chmod +x start.sh`)
+- **macOS/Linux:** `./start.sh` (already executable from a git clone; `chmod +x start.sh` only if you downloaded a ZIP)
 
 Your browser opens `http://127.0.0.1:8035/`. Click a card, hit **▶ RUN**, and watch. A different port: set `ARENA_PORT` before starting.
 
@@ -94,13 +94,16 @@ The library is pointed at the bridge purely via environment (`LLM_PROVIDER=opena
 | `ARENA_CODEX_TIMEOUT` | `300` | seconds per LLM call |
 | `ARENA_EMBED_MODEL` | `nomic-embed-text` | Ollama embedding model |
 | `ARENA_SWEEP_PARALLEL` | `3` | patterns run in parallel during RUN ALL |
+| `ARENA_CODEX_EXE` | auto-discovered | explicit path to the codex executable if discovery picks wrong |
 
 ## Troubleshooting
 
 - **`codex` not found / not logged in** — install the Codex CLI and run `codex login` (browser sign-in with your ChatGPT account). The header of `Start-Arena.bat` / `start.sh` warns if you're logged out.
 - **RAG/memory cards error with connection refused on :11434** — Ollama isn't running. Start Ollama, then `ollama pull nomic-embed-text` (setup does this when Ollama is up).
-- **BrowserAgent errors about Playwright** — you skipped the browser install. Run `.venv/bin/python -m playwright install chromium` (Windows: `.venv\Scripts\python -m playwright install chromium`).
-- **Port 8035 busy** — the launchers free it automatically; or set `ARENA_PORT`.
+- **BrowserAgent errors about Playwright** — you skipped the browser install. Run `.venv/bin/python -m playwright install chromium` (Windows: `.venv\Scripts\python -m playwright install chromium`). On Linux, missing system libraries need `sudo .venv/bin/python -m playwright install-deps chromium` as well.
+- **Every run 500s with `codex bridge failure`** — the bridge couldn't invoke codex. Check `codex login status` in a terminal; if codex works there but the Arena still fails, point the bridge at it explicitly: set `ARENA_CODEX_EXE` to the full path of your codex executable and restart.
+- **Port 8035 busy** — the launchers try to free it (netstat/taskkill on Windows, lsof/kill where available); otherwise set `ARENA_PORT`.
+- **Leaderboard file** — after a sweep: `.venv\Scripts\python dashboard\make_summary.py` (mac/linux: `.venv/bin/python dashboard/make_summary.py`) writes `results/SWEEP.md`.
 - **Runs feel slow** — each LLM call is a fresh `codex exec` (~3–7 s at spark/low). That's the trade for $0 API spend. Reduce with lower-call patterns or keep effort at `low`.
 - **A run fails its checks** — that's a real model answer failing the benchmark check, not a crash. Hit RUN again, raise effort, or read the node inspector to see exactly where it went sideways.
 - **Stale-looking UI after pulling an update** — hard-refresh once; the server sends `no-store` so assets shouldn't cache, but an old tab from a previous server can linger.

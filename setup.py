@@ -48,6 +48,10 @@ def step_checks() -> bool:
     if sys.version_info < (3, 10):
         print(f"{FAIL} Python 3.10+ required (you have {sys.version.split()[0]}). Install 3.12 and re-run.")
         ok = False
+    elif sys.version_info >= (3, 14):
+        print(f"{FAIL} Python {sys.version.split()[0]} is newer than the tested band (3.10-3.13) — "
+              "binary wheels for faiss/uvloop may not exist yet. Install 3.12 and re-run.")
+        ok = False
     else:
         print(f"{OK} Python {sys.version.split()[0]}")
 
@@ -133,7 +137,16 @@ def step_venv(with_browser: bool) -> None:
     print(f"{OK} dependencies installed into .venv")
     if with_browser:
         print("...  installing Playwright Chromium for BrowserAgent (~130 MB; --no-browser to skip)")
-        r = run([py, "-m", "playwright", "install", "chromium"])
+        if sys.platform.startswith("linux"):
+            # Linux needs system libraries too; --with-deps uses apt/sudo and may prompt.
+            r = run([py, "-m", "playwright", "install", "--with-deps", "chromium"])
+            if r.returncode != 0:
+                r = run([py, "-m", "playwright", "install", "chromium"])
+                if r.returncode == 0:
+                    print(f"{WARN} Chromium installed, but system deps may be missing — if BrowserAgent "
+                          f"fails to launch, run: sudo {py} -m playwright install-deps chromium")
+        else:
+            r = run([py, "-m", "playwright", "install", "chromium"])
         print(f"{OK} Chromium installed" if r.returncode == 0
               else f"{WARN} Chromium install failed — only the BrowserAgent card is affected:\n{(r.stderr or r.stdout)[-500:]}")
 
@@ -146,6 +159,10 @@ def step_embed_model() -> None:
                 return
     except Exception:
         print(f"{WARN} skipping embedding-model pull (Ollama not reachable)")
+        return
+    if not shutil.which("ollama"):
+        print(f"{WARN} Ollama server is up but the `ollama` CLI isn't on PATH — "
+              f"pull the model yourself: ollama pull {EMBED_MODEL}")
         return
     print(f"...  pulling '{EMBED_MODEL}' into Ollama (~270 MB, one-off)")
     r = run(["ollama", "pull", EMBED_MODEL], shell=(sys.platform == "win32"))

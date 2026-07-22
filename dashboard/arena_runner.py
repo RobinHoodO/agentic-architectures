@@ -1,5 +1,5 @@
-﻿"""
-arena_runner â€” catalog, run manager, and dashboard API for all 35 architectures.
+"""
+arena_runner — catalog, run manager, and dashboard API for all 35 architectures.
 
 Every run executes the REAL library (agentic_architectures) with the LLM served by
 the codex shim (ChatGPT subscription) and embeddings by local Ollama. Live progress
@@ -50,7 +50,7 @@ SANDBOX = DEMO / ".sandbox"
 SANDBOX.mkdir(parents=True, exist_ok=True)
 
 # ---------------------------------------------------------------------------
-# keyless web search tool â€” codex exec --search on the subscription
+# keyless web search tool — codex exec --search on the subscription
 # ---------------------------------------------------------------------------
 
 
@@ -67,7 +67,7 @@ def web_search(query: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# catalog â€” the 35 numbered patterns (+ BrowserAgent, the un-numbered 34b)
+# catalog — the 35 numbered patterns (+ BrowserAgent, the un-numbered 34b)
 # family keys drive the UI grouping/colors; tasks come from benchmarks/tasks.yaml
 # ---------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ T = {
     "planning_task": ("Plan a 3-day vegetarian-friendly itinerary for Tokyo on a $200/day budget.\n"
                       "Mention at least one restaurant and one attraction per day.", {"contains": ["tokyo"]}),
     # MentalLoop's output is BY DESIGN a short decision-explanation (which option won and why),
-    # not the itinerary itself â€” the yaml's "tokyo" word-check misfits it. Score the mechanism.
+    # not the itinerary itself — the yaml's "tokyo" word-check misfits it. Score the mechanism.
     "planning_decide": ("Plan a 3-day vegetarian-friendly itinerary for Tokyo on a $200/day budget.\n"
                         "Mention at least one restaurant and one attraction per day.",
                         {"metadata": {"n_candidates": ">=2", "chosen_score": ">=1"}}),
@@ -133,7 +133,7 @@ T = {
 }
 
 # Dict order = on-screen family order = the video spine's teaching order (2026-07-22;
-# tools first â€” the patterns people already know from driving coding agents).
+# tools first — the patterns people already know from driving coding agents).
 FAMILIES = {
     "tools": ("Tools & Actions", "#e85d8a"),
     "reflect": ("Reasoning & Reflection", "#4a9eed"),
@@ -148,20 +148,20 @@ FAMILIES = {
 # (class, notebook#, family, pattern one-liner, reference tag, task key, needs)
 # Row order = on-screen card order within each family = the video spine's walk order
 # (2026-07-22): solo-WALK exemplars lead their family; the staged wrong-job swap-demo
-# cards (Reflexion Â· Ensemble Â· AgentWorkflowMemory) sit last in theirs.
+# cards (Reflexion · Ensemble · AgentWorkflowMemory) sit last in theirs.
 CATALOG_ROWS = [
-    # Tools & Actions (first â€” the loop people already drive in coding agents)
+    # Tools & Actions (first — the loop people already drive in coding agents)
     ("ToolUse", "02", "tools", "Agent + tools in a loop", "LangChain reference", "web_search_tool", ["search"]),
-    ("ReAct", "03", "tools", "Thought â†’ Action â†’ Observation", "Yao 2022", "web_search_tool", ["search"]),
-    ("Planning", "04", "tools", "Decompose â†’ execute â†’ replan", "Wei 2022", "planning_task", []),
+    ("ReAct", "03", "tools", "Thought → Action → Observation", "Yao 2022", "web_search_tool", ["search"]),
+    ("Planning", "04", "tools", "Decompose → execute → replan", "Wei 2022", "planning_task", []),
     ("BrowserAgent", "34b", "tools", "REAL Chromium via Playwright + safety gate", "Anthropic 2024", "web_navigate", ["browser"]),
     ("SWEAgent", "33", "tools", "Sandboxed file-system coding agent", "Yang 2024", "code_repo_fix", ["code-exec"]),
-    ("PEV", "06", "tools", "Plan â†’ execute â†’ verify each step", "this repo", "creative_writing", []),
+    ("PEV", "06", "tools", "Plan → execute → verify each step", "this repo", "creative_writing", []),
     # Reasoning & Reflection
-    ("Reflection", "01", "reflect", "Generate â†’ critique â†’ refine", "Madaan 2023", "math_word", []),
-    ("SelfDiscover", "19", "reflect", "SELECT â†’ ADAPT â†’ IMPLEMENT â†’ SOLVE", "Zhou 2024", "math_word", []),
+    ("Reflection", "01", "reflect", "Generate → critique → refine", "Madaan 2023", "math_word", []),
+    ("SelfDiscover", "19", "reflect", "SELECT → ADAPT → IMPLEMENT → SOLVE", "Zhou 2024", "math_word", []),
     ("ChainOfVerification", "20", "reflect", "Verify each claim independently", "Dhuliawala 2023", "factual_trap", []),
-    ("ConstitutionalAI", "32", "reflect", "Per-rule pass/fail â†’ revise", "Bai 2022", "constitutional", []),
+    ("ConstitutionalAI", "32", "reflect", "Per-rule pass/fail → revise", "Bai 2022", "constitutional", []),
     ("Reflexion", "18", "reflect", "Verbal reflections in episodic memory", "Shinn 2023", "math_word_reflex", ["embeddings"]),
     # Retrieval (RAG)
     ("CorrectiveRAG", "24", "rag", "Grade docs, fall back when weak", "Yan 2024", "multi_hop_rag", ["embeddings"]),
@@ -176,7 +176,7 @@ CATALOG_ROWS = [
     ("Voyager", "29", "memory", "Reusable Python skills (real subprocess)", "Wang 2023", "code_gen", ["embeddings", "code-exec"]),
     ("AgentWorkflowMemory", "35", "memory", "Reusable workflow recipes", "Wang 2024", "math_word_awm", ["embeddings"]),
     # Sampling & Search
-    ("MentalLoop", "10", "search", "Simulate â†’ score â†’ act", "this repo", "planning_decide", []),
+    ("MentalLoop", "10", "search", "Simulate → score → act", "this repo", "planning_decide", []),
     ("TreeOfThoughts", "09", "search", "Beam search over thoughts", "Yao 2023", "math_word", []),
     ("SelfConsistency", "21", "search", "Sample N paths, majority vote", "Wang 2022", "trick_logic", []),
     ("LATS", "22", "search", "MCTS tree with reward backup", "Zhou 2024", "math_word", []),
@@ -186,9 +186,9 @@ CATALOG_ROWS = [
     ("Blackboard", "07", "multi", "Shared workspace, cooperating agents", "classical AI", "creative_writing", []),
     ("MetaController", "11", "multi", "Router over architectures", "this repo", "planning_task", []),
     ("Debate", "28", "multi", "N agents argue for K rounds", "Du 2023", "trick_logic", []),
-    ("STORM", "30", "multi", "Multi-perspective research â†’ article", "Shao 2024", "research_synthesis", []),
+    ("STORM", "30", "multi", "Multi-perspective research → article", "Shao 2024", "research_synthesis", []),
     # Safety & Routing
-    ("DryRun", "14", "safety", "Propose â†’ simulate â†’ approval gate", "this repo", "safety_destructive", []),
+    ("DryRun", "14", "safety", "Propose → simulate → approval gate", "this repo", "safety_destructive", []),
     ("ReflexiveMetacognitive", "17", "safety", "Self-aware capability routing", "this repo", "route_medical", []),
     ("ComputerUse", "34", "safety", "Mock GUI loop + deterministic gate", "Anthropic 2024", "safety_domain", []),
     # Specialty
@@ -228,7 +228,7 @@ ARCH_KWARGS: dict[str, dict[str, Any]] = {
 
 # Cards whose default task deliberately misfits the pattern get flagged here (amber chip in the UI).
 # Currently empty: every default task is fitted to what its pattern is FOR, so all 36 demo green.
-# The misfit-failure demos (recall on Reflexion/AWM, Sally on Ensemble) are a paste away â€” see README.
+# The misfit-failure demos (recall on Reflexion/AWM, Sally on Ensemble) are a paste away — see README.
 EXPECTED_FAIL: dict[str, str] = {}
 
 # Plain-English explainers shown in the drawer: what the pattern actually does (mapped to its
@@ -236,27 +236,27 @@ EXPECTED_FAIL: dict[str, str] = {}
 # THIS is what the card is teaching.
 EXPLAIN: dict[str, tuple[str, str]] = {
     "Reflection": (
-        "Drafts an answer (generate), has a judge score and critique it 1â€“10 (critique), then rewrites "
-        "using that critique (refine) â€” looping until the score clears the target or iterations run out.",
+        "Drafts an answer (generate), has a judge score and critique it 1–10 (critique), then rewrites "
+        "using that critique (refine) — looping until the score clears the target or iterations run out.",
         "Quality-over-latency outputs: reports, emails, code snippets, marketing copy."),
     "ToolUse": (
         "The model is handed tools. Each round it either calls one (the harness executes it for real and "
-        "feeds the result back) or gives the final answer â€” the simplest decide â†’ act â†’ observe loop.",
+        "feeds the result back) or gives the final answer — the simplest decide → act → observe loop.",
         "Anything needing live data or actions: web lookups, calculators, internal APIs."),
     "ReAct": (
-        "Interleaves an explicit written Thought before every Action, then reads the Observation â€” the "
+        "Interleaves an explicit written Thought before every Action, then reads the Observation — the "
         "visible reasoning trace steers each next tool call.",
         "Multi-hop research: 'find X, then use X to find Y', debugging with searches."),
     "Planning": (
         "First decomposes the goal into an ordered step list, then executes the steps one by one, "
-        "replanning when a result changes the picture â€” plan and execution are separate concerns.",
+        "replanning when a result changes the picture — plan and execution are separate concerns.",
         "Long multi-part deliverables: itineraries, migration checklists, briefs."),
     "MultiAgent": (
         "A supervisor routes the task to specialist agents (each with its own tools and persona), collects "
         "their contributions, and a writer synthesizes one answer.",
         "Work spanning domains: research + numbers + copy in one deliverable."),
     "PEV": (
-        "Plans steps, executes each one, and a verifier gates EVERY step â€” a failed step is retried with "
+        "Plans steps, executes each one, and a verifier gates EVERY step — a failed step is retried with "
         "the verifier's critique attached before the plan may continue.",
         "Pipelines where one silently-wrong middle step poisons the rest: data transforms, multi-step calculations."),
     "Blackboard": (
@@ -266,12 +266,12 @@ EXPLAIN: dict[str, tuple[str, str]] = {
         "Open-ended creative or analysis work where you can't script who should speak when."),
     "EpisodicSemanticAgent": (
         "Remembers two ways at once: recall past turns + known facts from both memories (retrieve), reply "
-        "(answer), then WRITE BACK â€” distill new (subject, predicate, object) triples into the semantic "
+        "(answer), then WRITE BACK — distill new (subject, predicate, object) triples into the semantic "
         "graph (extract) and file the whole turn into episodic memory (record).",
         "Assistants that must remember users across sessions: preferences, profile facts, decisions."),
     "TreeOfThoughts": (
         "Instead of one chain of reasoning: propose K deliberately-different next thoughts (generate), "
-        "judge each on a strict 1â€“5 rubric (score), keep only the top beam (prune), and loop deeper â€” "
+        "judge each on a strict 1–5 rubric (score), keep only the top beam (prune), and loop deeper — "
         "the best complete path wins.",
         "Problems where the first idea is often wrong: math, constraint puzzles, tricky planning."),
     "MentalLoop": (
@@ -281,34 +281,34 @@ EXPLAIN: dict[str, tuple[str, str]] = {
     "MetaController": (
         "A router over other architectures: classifies the incoming task and dispatches it to the "
         "best-fitting pattern in its roster (here planning vs reflection), returning that pattern's result.",
-        "A front door for mixed workloads â€” one endpoint, many task shapes."),
+        "A front door for mixed workloads — one endpoint, many task shapes."),
     "GraphMemoryAgent": (
         "ingest() distills documents into a knowledge graph of triples; a question extracts its entities, "
         "walks the graph around them, and answers strictly from the connected facts it finds.",
         "Q&A over interlinked entities: org structures, product catalogs, specs."),
     "Ensemble": (
         "Fires N independent voters at the same task and aggregates their answers (majority vote or "
-        "weighting) â€” independent errors cancel, agreement survives.",
+        "weighting) — independent errors cancel, agreement survives.",
         "Cheap reliability boosts on short factual or numeric answers."),
     "DryRun": (
         "Nothing executes directly: the agent proposes an action, a simulator predicts its effect, and a "
-        "reviewer approves or blocks BEFORE anything runs â€” destructive requests die in review.",
+        "reviewer approves or blocks BEFORE anything runs — destructive requests die in review.",
         "Any agent allowed near real systems: shell commands, DB writes, outbound email."),
     "RLHFSelfImprovement": (
         "Generates candidates, scores them across explicit dimensions with deterministic rubrics, archives "
-        "the best-so-far, and iterates against its own archive â€” self-play for quality.",
+        "the best-so-far, and iterates against its own archive — self-play for quality.",
         "Squeezing quality on small artifacts: taglines, prompts, product copy."),
     "CellularAutomata": (
         "A grid where every cell is a tiny LLM agent that reads its neighbours and an English rule, then "
-        "updates in sync each step â€” global behaviour emerges from purely local decisions.",
+        "updates in sync each step — global behaviour emerges from purely local decisions.",
         "Simulations and emergence demos: spread models, ecosystem toys."),
     "ReflexiveMetacognitive": (
         "Before answering, the agent assesses its OWN competence for this request and routes accordingly: "
-        "answer, hedge with caveats, or escalate to a human â€” self-awareness as a safety gate.",
+        "answer, hedge with caveats, or escalate to a human — self-awareness as a safety gate.",
         "High-stakes triage: medical, legal, financial questions."),
     "Reflexion": (
         "Attempts the task, evaluates its own answer, writes a verbal lesson into episodic memory "
-        "(reflect), and retries informed by its accumulated lessons â€” improvement across trials.",
+        "(reflect), and retries informed by its accumulated lessons — improvement across trials.",
         "Tasks with a checkable success signal where retries help: code fixes, puzzles."),
     "SelfDiscover": (
         "Composes its own reasoning recipe before solving: SELECTs useful thinking modules, ADAPTs them to "
@@ -319,29 +319,29 @@ EXPLAIN: dict[str, tuple[str, str]] = {
         "separately so errors can't defend themselves, then rewrites keeping only what survived.",
         "Hallucination-prone factual output: lists, bios, citations."),
     "SelfConsistency": (
-        "Samples N diverse reasoning paths for the same question and majority-votes the final answers â€” "
+        "Samples N diverse reasoning paths for the same question and majority-votes the final answers — "
         "correct reasoning converges while mistakes scatter.",
         "Math and logic one-shots where a single chain is flaky."),
     "LATS": (
         "Monte-Carlo tree search over reasoning moves: pick the most promising leaf by UCB1 (select), "
         "generate K candidate next moves (expand), judge each with a deterministic reward rubric "
-        "(evaluate), then propagate the reward up the tree (backup) â€” and loop.",
+        "(evaluate), then propagate the reward up the tree (backup) — and loop.",
         "Hard search problems worth many calls: agent trajectories, game-like tasks."),
     "AgenticRAG": (
-        "The agent DECIDES if and what to retrieve â€” possibly several rounds, reformulating its query each "
-        "time â€” instead of blindly stuffing top-k chunks into context.",
+        "The agent DECIDES if and what to retrieve — possibly several rounds, reformulating its query each "
+        "time — instead of blindly stuffing top-k chunks into context.",
         "Corpus Q&A with multi-hop or ambiguous questions."),
     "CorrectiveRAG": (
         "Retrieves, then GRADES each document's relevance; weak evidence triggers a corrective fallback "
         "(query rewrite / web search) before any answer is written.",
         "RAG over patchy indexes where bad retrievals are common."),
     "SelfRAG": (
-        "Emits reflection tokens about each retrieved passage â€” retrieve? relevant? supported? â€” and only "
+        "Emits reflection tokens about each retrieved passage — retrieve? relevant? supported? — and only "
         "answers from passages it explicitly endorsed.",
         "RAG that must be faithful and citable."),
     "AdaptiveRAG": (
-        "Classifies query complexity FIRST, then routes: simple â†’ answer directly, moderate â†’ one "
-        "retrieval, complex â†’ multi-step retrieval â€” effort proportional to need.",
+        "Classifies query complexity FIRST, then routes: simple → answer directly, moderate → one "
+        "retrieval, complex → multi-step retrieval — effort proportional to need.",
         "Mixed traffic where most queries don't need the expensive path."),
     "GraphRAG": (
         "Builds a knowledge graph from the corpus, detects communities of related entities, and "
@@ -353,7 +353,7 @@ EXPLAIN: dict[str, tuple[str, str]] = {
         "Contested questions where single-model bias is the worry."),
     "Voyager": (
         "Writes Python skills, EXECUTES them for real in a subprocess, keeps the ones that work in a "
-        "vector-indexed library, and composes past skills into new ones â€” a growing toolbox.",
+        "vector-indexed library, and composes past skills into new ones — a growing toolbox.",
         "Recurring programmatic tasks that should get faster every time."),
     "STORM": (
         "Spawns multiple personas (perspectives), each interviews the topic with pointed questions, "
@@ -361,28 +361,28 @@ EXPLAIN: dict[str, tuple[str, str]] = {
         "Long-form balanced research: wiki-style articles, briefing docs."),
     "MemGPT": (
         "Operating-system-style memory: a small always-in-context core plus archival storage, with the "
-        "agent paging facts in and out itself â€” virtual memory for conversations.",
+        "agent paging facts in and out itself — virtual memory for conversations.",
         "Long-running chats that outgrow the context window."),
     "ConstitutionalAI": (
-        "Checks the draft against an explicit rule list â€” each rule gets its own pass/fail (critique) â€” "
+        "Checks the draft against an explicit rule list — each rule gets its own pass/fail (critique) — "
         "then revises to fix exactly the failed rules. Principles, not vibes.",
         "Enforcing brand, safety, or style policies on outputs."),
     "SWEAgent": (
         "A coding agent with file tools in a sandboxed working dir: it lists and reads files, writes "
-        "edits, and calls run_check to execute the code â€” navigate, fix, verify.",
+        "edits, and calls run_check to execute the code — navigate, fix, verify.",
         "Repo-level bug fixes with a runnable check."),
     "ComputerUse": (
         "Drives a (mock) GUI through a strict loop: observe screen state, choose ONE categorical action "
         "(navigate / click / type), pass a deterministic safety gate, repeat.",
         "Studying the computer-use loop and safety gating without a real browser."),
     "BrowserAgent": (
-        "The real thing: headless Chromium via Playwright â€” navigate, read the page, click, extract â€” "
+        "The real thing: headless Chromium via Playwright — navigate, read the page, click, extract — "
         "with every URL checked against a domain blocklist and outputs scanned for sensitive patterns.",
         "Web tasks needing a real page: reading a heading, scraping a value, guided navigation."),
     "AgentWorkflowMemory": (
-        "After each solved task it mines a reusable 3â€“6-step recipe (extract) and indexes it; a new task "
+        "After each solved task it mines a reusable 3–6-step recipe (extract) and indexes it; a new task "
         "retrieves the closest recipe (retrieve) and follows it instead of starting cold.",
-        "Task families you solve repeatedly â€” the second one should be faster than the first."),
+        "Task families you solve repeatedly — the second one should be faster than the first."),
 }
 
 CATALOG = {}
@@ -416,7 +416,7 @@ def _make_arch(cls_name: str, llm, light: bool = False):
         else:
             from agentic_architectures.data import STARDUST_CORPUS
             kwargs.setdefault("documents", list(STARDUST_CORPUS))
-    # GraphMemoryAgent has NO documents kwarg â€” it wants explicit .ingest() calls (done in _execute)
+    # GraphMemoryAgent has NO documents kwarg — it wants explicit .ingest() calls (done in _execute)
     if cls_name in ("ToolUse", "ReAct", "MultiAgent", "Planning", "PEV"):
         kwargs.setdefault("tools", [web_search])  # keyless codex-search replaces the Tavily default
     if cls_name == "SWEAgent":
@@ -438,7 +438,7 @@ def _make_arch(cls_name: str, llm, light: bool = False):
 
 
 # ---------------------------------------------------------------------------
-# default graph topologies â€” precomputed once, cached to disk
+# default graph topologies — precomputed once, cached to disk
 # ---------------------------------------------------------------------------
 
 GRAPHS_FILE = RESULTS_FILE.parent / "graphs.json"
@@ -518,7 +518,7 @@ def _score(checks: dict, output: str, metadata: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# live event capture â€” configure-hook handler sees EVERY nested LLM/tool call
+# live event capture — configure-hook handler sees EVERY nested LLM/tool call
 # ---------------------------------------------------------------------------
 
 _active_handler: contextvars.ContextVar = contextvars.ContextVar("arena_handler", default=None)
@@ -739,7 +739,7 @@ def _extract_kg(arch) -> dict | None:
 
 def _extract_workspace(arch_name: str, arch, result) -> dict | None:
     """Per-arch 'shared workspace' artifacts for the drawer viewer: what the agents
-    actually wrote â€” board contributions, mined skills/recipes, in-context memory."""
+    actually wrote — board contributions, mined skills/recipes, in-context memory."""
     try:
         items: list[dict] = []
         if arch_name == "Blackboard" and result is not None:
@@ -747,12 +747,12 @@ def _extract_workspace(arch_name: str, arch, result) -> dict | None:
                 if t.get("type") == "contribution":
                     items.append({"tag": f"round {t.get('round')}", "label": str(t.get("agent", "")).title(),
                                   "content": str(t.get("content", ""))})
-            return {"title": "Shared blackboard â€” what each specialist wrote", "items": items} if items else None
+            return {"title": "Shared blackboard — what each specialist wrote", "items": items} if items else None
         if arch_name == "Voyager":
             for s in getattr(arch, "skills", None) or []:
                 body = (str(s.get("description", "")) + "\n\n" + str(s.get("code", ""))).strip()
                 items.append({"tag": "skill", "label": str(s.get("name", "")), "content": body, "code": True})
-            return {"title": "Skill library â€” LLM-written Python, really executed", "items": items} if items else None
+            return {"title": "Skill library — LLM-written Python, really executed", "items": items} if items else None
         if arch_name == "AgentWorkflowMemory":
             for w in getattr(arch, "workflows", None) or []:
                 steps = "\n".join(f"{i + 1}. {s}" for i, s in enumerate(w.get("steps", [])))
@@ -762,7 +762,7 @@ def _extract_workspace(arch_name: str, arch, result) -> dict | None:
             tier = getattr(arch, "context_tier", None)
             for e in list(tier or []):
                 items.append({"tag": "in-context", "label": "", "content": str(e)})
-            return {"title": "Core context tier â€” what stayed in the window", "items": items} if items else None
+            return {"title": "Core context tier — what stayed in the window", "items": items} if items else None
         return None
     except Exception:
         return None
@@ -812,7 +812,7 @@ def _execute(run: Run) -> None:
         run.error = "stopped by user"
         run.status = "stopped"
     except Exception as e:
-        if run.cancelled:  # cancel raced with another failure â€” report the stop
+        if run.cancelled:  # cancel raced with another failure — report the stop
             run.error = "stopped by user"
             run.status = "stopped"
         else:
@@ -965,7 +965,7 @@ async def api_run_stop(run_id: str):
     if not run:
         return JSONResponse(status_code=404, content={"error": "no such run"})
     run.cancelled = True
-    run.emit({"t": "phase", "label": "STOP requested â€” halting at the next step boundary"})
+    run.emit({"t": "phase", "label": "STOP requested — halting at the next step boundary"})
     return {"ok": True, "status": run.status}
 
 
@@ -1053,7 +1053,7 @@ async def tools_web_search(request: Request):
         "Plain text only."
     )
     out_file = codex_shim.SCRATCH / f"search-{uuid.uuid4().hex}.txt"
-    cmd = [codex_shim.CODEX_EXE, "exec", "--skip-git-repo-check", "--ignore-user-config",
+    cmd = [*codex_shim.CODEX_CMD, "exec", "--skip-git-repo-check", "--ignore-user-config",
            "-s", "read-only", "--ephemeral", "--color", "never", "-C", str(codex_shim.SCRATCH),
            "-m", codex_shim.DEFAULT_MODEL, "-c", 'model_reasoning_effort="low"',
            "-c", "tools.web_search=true", "-o", str(out_file), "-"]

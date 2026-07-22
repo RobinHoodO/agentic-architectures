@@ -1,3 +1,6 @@
+# Modified from "Agentic Architectures" (c) 2026 Fareed Khan, MIT License
+# https://github.com/FareedKhan-dev/all-agentic-architectures  (base commit cf9d620)
+# Modifications (c) 2026 The AI Automators, MIT - see repo README "What we changed".
 """Episodic + Semantic Memory — dual-memory agent.
 
 An agent that maintains **two** distinct memory systems that persist across
