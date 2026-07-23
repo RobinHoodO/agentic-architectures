@@ -110,6 +110,11 @@ button:disabled { opacity: .45; cursor: default; }
   width: 100%; max-width: 1460px; margin: 0 auto;
   display: flex; gap: 20px; align-items: flex-start;
 }
+/* On wide screens, anchor the overlay content LEFT and cap its width so the
+   bottom-right corner stays clear — that's where a recording facecam lives. */
+@media (min-width: 1500px) {
+  .dhead, .dbody { margin: 0 0 0 48px; max-width: 1360px; }
+}
 .dcol { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
 .dcol-left { flex: 2; max-width: 520px; position: sticky; top: 0; }
 .dcol-right { flex: 3; }
