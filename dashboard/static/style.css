@@ -158,8 +158,11 @@ textarea#task { width: 100%; min-height: 74px; resize: vertical; font-size: 13px
 #stopbtn:hover { border-color: var(--red); color: var(--red); }
 
 /* graph */
-#graphwrap { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 6px; overflow: hidden; }
-#graph { display: block; margin: 0 auto; width: 100%; height: auto; cursor: grab; }
+#graphwrap {
+  background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 6px;
+  overflow: hidden; height: 430px; min-height: 140px; resize: vertical;
+}
+#graph { display: block; margin: 0 auto; width: 100%; height: 100%; cursor: grab; }
 #graph:active { cursor: grabbing; }
 .gnode rect {
   fill: #232936; stroke: #3a4150; stroke-width: 1.4; rx: 7;
@@ -201,8 +204,9 @@ textarea#task { width: 100%; min-height: 74px; resize: vertical; font-size: 13px
 /* knowledge-graph viewer */
 #kgwrap {
   background: #0c0e12; border: 1px solid var(--line); border-radius: 10px; overflow: hidden;
+  height: 404px; min-height: 160px; resize: vertical;
 }
-#kgsvg { display: block; width: 100%; height: 400px; cursor: grab; }
+#kgsvg { display: block; width: 100%; height: 100%; cursor: grab; }
 #kgsvg:active { cursor: grabbing; }
 .kgedge { stroke: #48506088; stroke-width: 1.2; }
 .kgnode { cursor: pointer; }

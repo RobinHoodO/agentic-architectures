@@ -653,6 +653,7 @@ function drawGraph(graph) {
     graphState = { nodes: [], edges: [], pos: {} }; lastGraphJson = null;
     svg.setAttribute("viewBox", "0 0 620 40");
     svg.style.maxWidth = "620px";
+    $("graphwrap").style.height = "60px";
     return;
   }
   lastGraphJson = graph;
@@ -686,7 +687,9 @@ function drawGraph(graph) {
   svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
   svg.removeAttribute("width");
   svg.removeAttribute("height");
-  svg.style.maxWidth = width + "px";
+  svg.style.maxWidth = "none";
+  // canvas starts sized to the graph (capped) and is user-resizable via the corner grip
+  $("graphwrap").style.height = Math.min(height + 14, 620) + "px";
   gNat = [width, height];
   gVb = [0, 0, width, height];
   wireGraphNav(svg);
