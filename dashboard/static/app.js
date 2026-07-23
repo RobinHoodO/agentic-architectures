@@ -440,7 +440,11 @@ function closeNodeModal() {
 }
 $("nm-close").onclick = closeNodeModal;
 $("nodemodal").onclick = (e) => { if (e.target.id === "nodemodal") closeNodeModal(); };
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeNodeModal(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!$("nodemodal").classList.contains("nm-hidden")) { closeNodeModal(); return; }
+  if ($("drawer").classList.contains("open")) $("d-close").click();
+});
 
 function setDot(cls, status, label) {
   const dot = $("dot-" + cls);

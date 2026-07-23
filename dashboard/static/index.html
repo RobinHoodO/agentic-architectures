@@ -46,46 +46,50 @@
       <div class="meta"><span id="d-pattern"></span> &middot; <span id="d-ref"></span></div>
     </div>
     <div class="dbody">
-      <div id="explainbox">
-        <div id="d-explain"></div>
-        <div id="d-usewhen"></div>
-        <details id="d-exwrap">
-          <summary>Worked example — a concrete scenario to illustrate it</summary>
-          <div id="d-example"></div>
-        </details>
-      </div>
-      <div>
-        <h4>Task</h4>
-        <textarea id="task" spellcheck="false"></textarea>
-        <div class="runrow" style="margin-top:8px">
-          <button class="primary" id="runbtn">&#9654; RUN</button>
-          <button id="stopbtn" style="display:none">&#9632; STOP</button>
-          <span id="runstate" class="dim" style="color:var(--dim);font-size:12px"></span>
-          <span class="spacer"></span>
-          <span id="verdict"></span>
+      <div class="dcol dcol-left">
+        <div id="explainbox">
+          <div id="d-explain"></div>
+          <div id="d-usewhen"></div>
+          <details id="d-exwrap">
+            <summary>Worked example — a concrete scenario to illustrate it</summary>
+            <div id="d-example"></div>
+          </details>
+        </div>
+        <div>
+          <h4>Task</h4>
+          <textarea id="task" spellcheck="false"></textarea>
+          <div class="runrow" style="margin-top:8px">
+            <button class="primary" id="runbtn">&#9654; RUN</button>
+            <button id="stopbtn" style="display:none">&#9632; STOP</button>
+            <span id="runstate" class="dim" style="color:var(--dim);font-size:12px"></span>
+            <span class="spacer"></span>
+            <span id="verdict"></span>
+          </div>
+        </div>
+        <div>
+          <h4>Output</h4>
+          <div id="output" class="dim">&mdash;</div>
+          <div id="metachips" style="margin-top:8px"></div>
         </div>
       </div>
-      <div>
-        <h4>Live graph <span id="gsub" style="text-transform:none;letter-spacing:0;color:#58627599">(click a node for its prompts &amp; outputs)</span></h4>
-        <div id="graphwrap"><svg id="graph" width="620" height="120"></svg></div>
-      </div>
-      <div id="wssection" style="display:none">
-        <h4 id="wstitle">Workspace</h4>
-        <div id="wsbody"></div>
-      </div>
-      <div id="kgsection" style="display:none">
-        <h4>Knowledge graph <span style="text-transform:none;letter-spacing:0;color:#58627599">(entities &amp; triples this run built — drag nodes, wheel to zoom)</span></h4>
-        <div id="kgwrap"><svg id="kgsvg"></svg></div>
-        <div id="kglegend"></div>
-      </div>
-      <div>
-        <h4>Event feed</h4>
-        <div id="feed"></div>
-      </div>
-      <div>
-        <h4>Output</h4>
-        <div id="output" class="dim">&mdash;</div>
-        <div id="metachips" style="margin-top:8px"></div>
+      <div class="dcol dcol-right">
+        <div>
+          <h4>Live graph <span id="gsub" style="text-transform:none;letter-spacing:0;color:#58627599">(click a node for its prompts &amp; outputs)</span></h4>
+          <div id="graphwrap"><svg id="graph" width="620" height="120"></svg></div>
+        </div>
+        <div id="wssection" style="display:none">
+          <h4 id="wstitle">Workspace</h4>
+          <div id="wsbody"></div>
+        </div>
+        <div id="kgsection" style="display:none">
+          <h4>Knowledge graph <span style="text-transform:none;letter-spacing:0;color:#58627599">(entities &amp; triples this run built — drag nodes, wheel to zoom)</span></h4>
+          <div id="kgwrap"><svg id="kgsvg"></svg></div>
+          <div id="kglegend"></div>
+        </div>
+        <div>
+          <h4>Event feed</h4>
+          <div id="feed"></div>
+        </div>
       </div>
     </div>
   </aside>
