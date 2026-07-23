@@ -645,9 +645,16 @@ function drawGraph(graph) {
   svg.innerHTML = `<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5"
     markerWidth="8" markerHeight="8" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
     <path d="M 0 0 L 10 5 L 0 10 z" fill="#485060"/></marker></defs>`;
-  $("gsub").textContent = graph ? "(click a node for its prompts & outputs)" : "(loading topology…)";
+  $("gsub").textContent = graph
+    ? "(click a node for its prompts & outputs · drag to pan · wheel to zoom · double-click to reset)"
+    : "(loading topology…)";
   nodeStats = {}; edgeCounts = {}; lastNode = null; activeNode = null;
-  if (!graph) { graphState = { nodes: [], edges: [], pos: {} }; lastGraphJson = null; svg.setAttribute("height", 40); return; }
+  if (!graph) {
+    graphState = { nodes: [], edges: [], pos: {} }; lastGraphJson = null;
+    svg.setAttribute("viewBox", "0 0 620 40");
+    svg.style.maxWidth = "620px";
+    return;
+  }
   lastGraphJson = graph;
 
   // BFS layering from __start__
@@ -674,8 +681,15 @@ function drawGraph(graph) {
   const width = Math.max(620, 150 * Math.max(...Object.values(byLayer).map((l) => l.length)));
   const rowH = 78, padY = 26;
   const height = padY * 2 + maxL * rowH + 30;
-  svg.setAttribute("width", width);
-  svg.setAttribute("height", height);
+  // viewBox + fluid width: the graph scales to fit its column (no horizontal scroll)
+  // and centers itself; wide graphs shrink, narrow ones stay native size.
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.removeAttribute("width");
+  svg.removeAttribute("height");
+  svg.style.maxWidth = width + "px";
+  gNat = [width, height];
+  gVb = [0, 0, width, height];
+  wireGraphNav(svg);
 
   const pos = {};
   for (const [l, members] of Object.entries(byLayer)) {
@@ -738,6 +752,42 @@ function drawGraph(graph) {
 
 let activeNode = null;
 const cssId = (s) => s.replace(/[^a-zA-Z0-9_-]/g, "_");
+
+/* live-graph canvas navigation: drag background to pan, wheel to zoom, dblclick to reset */
+let gNat = [620, 40];       // natural [w, h] of the current graph
+let gVb = [0, 0, 620, 40];  // current viewBox
+
+function wireGraphNav(svg) {
+  let panning = false;
+  const apply = () => svg.setAttribute("viewBox", gVb.join(" "));
+  svg.onmousedown = (ev) => {
+    if (ev.target.closest(".gnode")) return;  // node clicks stay clicks
+    panning = true;
+    ev.preventDefault();
+  };
+  svg.onmousemove = (ev) => {
+    if (!panning) return;
+    const r = svg.getBoundingClientRect();
+    gVb[0] -= (ev.movementX / r.width) * gVb[2];
+    gVb[1] -= (ev.movementY / r.height) * gVb[3];
+    apply();
+  };
+  svg.onmouseup = svg.onmouseleave = () => { panning = false; };
+  svg.onwheel = (ev) => {
+    ev.preventDefault();
+    const r = svg.getBoundingClientRect();
+    const mx = gVb[0] + ((ev.clientX - r.left) / r.width) * gVb[2];
+    const my = gVb[1] + ((ev.clientY - r.top) / r.height) * gVb[3];
+    const f = ev.deltaY > 0 ? 1.15 : 0.87;
+    gVb = [mx - (mx - gVb[0]) * f, my - (my - gVb[1]) * f, gVb[2] * f, gVb[3] * f];
+    apply();
+  };
+  svg.ondblclick = (ev) => {
+    if (ev.target.closest(".gnode")) return;
+    gVb = [0, 0, gNat[0], gNat[1]];
+    apply();
+  };
+}
 
 function setActiveNode(node) {
   if (activeNode === node) return;

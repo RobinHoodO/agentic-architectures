@@ -98,7 +98,12 @@ button:disabled { opacity: .45; cursor: default; }
 .dhead .row1 { display: flex; align-items: baseline; gap: 10px; }
 .dhead .bignum { font-size: 26px; font-weight: 800; color: var(--fam, var(--gold)); }
 .dhead h3 { font-size: 19px; }
-.dhead .close { margin-left: auto; background: none; border: none; color: var(--dim); font-size: 20px; }
+.dhead .close {
+  position: absolute; top: 12px; right: 20px; z-index: 5;
+  background: var(--panel2); border: 1px solid var(--line); border-radius: 8px;
+  color: var(--dim); font-size: 22px; line-height: 1; padding: 4px 11px 7px; cursor: pointer;
+}
+.dhead .close:hover { color: var(--text); border-color: var(--gold); }
 .dhead .meta { color: var(--dim); font-size: 12px; margin-top: 3px; }
 .dhead .chip {
   display: inline-block; border-radius: 4px; padding: 1px 7px; font-size: 10.5px;
@@ -153,8 +158,9 @@ textarea#task { width: 100%; min-height: 74px; resize: vertical; font-size: 13px
 #stopbtn:hover { border-color: var(--red); color: var(--red); }
 
 /* graph */
-#graphwrap { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 6px; overflow-x: auto; }
-#graph { display: block; margin: 0 auto; }
+#graphwrap { background: var(--panel2); border: 1px solid var(--line); border-radius: 10px; padding: 6px; overflow: hidden; }
+#graph { display: block; margin: 0 auto; width: 100%; height: auto; cursor: grab; }
+#graph:active { cursor: grabbing; }
 .gnode rect {
   fill: #232936; stroke: #3a4150; stroke-width: 1.4; rx: 7;
   transition: fill .15s, stroke .15s;
