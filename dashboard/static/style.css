@@ -109,6 +109,13 @@ button:disabled { opacity: .45; cursor: default; }
 #d-explain { color: var(--text); }
 #d-usewhen { color: var(--dim); margin-top: 6px; }
 #d-usewhen b { color: var(--fam, var(--gold)); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; }
+#d-exwrap { margin-top: 7px; border-top: 1px dashed #2a303b; padding-top: 6px; }
+#d-exwrap summary {
+  cursor: pointer; color: var(--fam, var(--gold)); font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .07em; user-select: none;
+}
+#d-exwrap summary:hover { filter: brightness(1.2); }
+#d-example { color: var(--text); margin-top: 7px; font-size: 12.6px; line-height: 1.6; }
 .dbody h4 {
   font-size: 10.5px; text-transform: uppercase; letter-spacing: .12em; color: var(--dim);
   margin-bottom: 5px;

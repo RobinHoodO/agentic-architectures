@@ -385,6 +385,163 @@ EXPLAIN: dict[str, tuple[str, str]] = {
         "Task families you solve repeatedly — the second one should be faster than the first."),
 }
 
+# Worked examples for the drawer fold-out: one concrete, readable scenario per pattern,
+# tracing the mechanism through the arch's actual node names — written to be read aloud.
+EXAMPLES: dict[str, str] = {
+    "Reflection": (
+        "Ask for a cold-outreach email to a podcast host. generate drafts one that buries the ask; "
+        "critique scores it 6/10 — \"the ask appears in sentence 9, there's no personalization hook\"; "
+        "refine moves the ask up front and opens with their latest episode. The score clears the bar and "
+        "the loop stops — two extra calls bought a visibly better email."),
+    "ToolUse": (
+        "\"What's 7.5% VAT on €1,842?\" The agent calls calculator(1842 * 0.075), reads 138.15 from the "
+        "observation, and answers with the exact figure instead of estimating. The same loop powers a "
+        "weather lookup or a CRM query — the tool call replaces the guess."),
+    "ReAct": (
+        "\"Which of our competitors raised funding this month?\" Thought: I need recent news → Action: "
+        "web_search(\"<competitor> funding round\") → Observation: a news result → Thought: verify the "
+        "amount → one more search → answer with the figure and the source. The written Thoughts are why "
+        "you can debug it when it goes sideways."),
+    "Planning": (
+        "\"Prepare our product launch.\" plan emits: 1) draft the announcement, 2) build the email "
+        "segment, 3) schedule socials, 4) brief support. Steps execute in order; when step 2 reveals the "
+        "segment is empty, replan inserts \"import the beta-user CSV\" before continuing — the plan bends "
+        "instead of breaking."),
+    "MultiAgent": (
+        "\"Research the EV-charging market and write an investor paragraph.\" The supervisor routes to "
+        "the news specialist (recent rounds), then the financial specialist (market size), and the writer "
+        "merges both into one sourced paragraph. Three narrow agents beat one overloaded prompt."),
+    "PEV": (
+        "Migrating a pricing table: the plan is extract rows → convert currency → recompute totals. "
+        "execute converts the currency, but verify catches that totals were computed on the OLD currency "
+        "— that one step retries with the verifier's critique attached, and the error never reaches the "
+        "final output."),
+    "Blackboard": (
+        "\"Name our new analytics feature.\" Each round the specialists bid on whether they have "
+        "something to add (bidding); the best bid writes to the shared board (act). After a few rounds "
+        "the board holds candidate names, objections, and precedents — synthesize merges it into a "
+        "shortlist with rationale. Open the Workspace below to read the actual board."),
+    "EpisodicSemanticAgent": (
+        "Session 1: \"I run a Shopify store selling ceramics, budget €200/month.\" extract distills "
+        "triples like (User → sells → ceramics) while record files the turn verbatim. Weeks later: "
+        "\"What ad channel should I try?\" — retrieve recalls both memories, so the answer fits ceramics "
+        "on €200, not a generic list."),
+    "TreeOfThoughts": (
+        "\"Slogan for a bakery that only sells sourdough.\" generate proposes three genuinely different "
+        "angles — heritage, single-mindedness, fermentation science; score gives the science angle 2/5 as "
+        "off-brand; prune keeps the strongest beam and the next layer deepens it. Dead-end angles die "
+        "early instead of anchoring the result."),
+    "MentalLoop": (
+        "\"Launch the beta this Friday, or wait two weeks?\" It simulates each option — Friday predicts "
+        "buzz plus a support-ticket spike; waiting predicts polish but momentum loss — scores the "
+        "simulations against a rubric, commits to the winner, and states the trade-off it accepted."),
+    "MetaController": (
+        "One endpoint receives \"plan my conference trip\" and \"polish this paragraph\". The router "
+        "classifies each and dispatches the first to Planning, the second to Reflection — callers never "
+        "have to know which pattern exists."),
+    "GraphMemoryAgent": (
+        "Ingest the team handbook → triples like (Aoife → leads → Design). Ask \"who approves design "
+        "hires?\" and retrieve walks Aoife's neighbourhood in the graph, then answer replies strictly "
+        "from those connected facts — or says the graph doesn't know. No hallucinated org chart."),
+    "Ensemble": (
+        "Three voters solve the muffin word-problem independently; one slips on Wednesday's doubling, "
+        "two get 179 — the majority vote discards the outlier. For short factual answers, disagreement "
+        "between voters is your error bar."),
+    "DryRun": (
+        "An ops agent proposes DELETE FROM users WHERE last_login < 2020. dry_run simulates it — "
+        "\"18,400 rows affected\" — and the reviewer sees the blast radius and blocks it pending human "
+        "approval. The query never touched the database."),
+    "RLHFSelfImprovement": (
+        "\"Write our homepage headline.\" Generate candidates, score each on clarity / specificity / "
+        "energy with a fixed rubric, archive the best, and generate again against the archive. Three "
+        "rounds later the champion beats every first draft — self-play, not vibes."),
+    "CellularAutomata": (
+        "Seed a 3×3 forest with one burning tree and the English rule \"a tree next to fire catches "
+        "fire; fire becomes ash\". Each cell-agent reads only its neighbours, yet a fire front sweeps "
+        "the grid — global behaviour nobody scripted. Watch it step-by-step in the Workspace grid below."),
+    "ReflexiveMetacognitive": (
+        "\"I get sharp chest pain climbing stairs\" → the agent assesses its own competence first and "
+        "routes to escalate with a see-a-professional-now message. \"What's a normal resting heart "
+        "rate?\" → within competence → answers directly. The gate is the feature."),
+    "Reflexion": (
+        "Fixing a failing regex: attempt 1 misses unicode input; evaluate fails it; reflect writes the "
+        "lesson \"I assumed ASCII — test unicode next time\" into episodic memory; attempt 2 reads that "
+        "lesson and passes. The lesson survives for the next task too."),
+    "SelfDiscover": (
+        "\"Fit 5 talks into 3 rooms with no speaker overlap.\" Instead of diving in, SELECT picks "
+        "reasoning modules (constraint checking, step-by-step simulation), ADAPT tailors them to "
+        "scheduling, IMPLEMENT assembles the recipe, and only then does SOLVE follow it."),
+    "ChainOfVerification": (
+        "\"List Hugo-winning Le Guin novels.\" The baseline includes a plausible wrong guess; plan writes "
+        "one independent verification question per claim; verify answers each in isolation — where the "
+        "wrong guess can't defend itself — and the rewrite keeps only the survivors."),
+    "SelfConsistency": (
+        "The Sally trick: sample five reasoning paths at high temperature; three conclude 1 sister, two "
+        "get tangled counting brothers. The vote returns 1. Correct reasoning converges — mistakes "
+        "scatter in different directions."),
+    "LATS": (
+        "The muffin problem as tree search: expand proposes next moves, evaluate scores each leaf with a "
+        "deterministic reward (progress? complete? no loops?), and backup propagates the reward so select "
+        "(UCB1) stops wasting calls on the branch that misread Tuesday. Search that learns during the run."),
+    "AgenticRAG": (
+        "\"What propellant does the Phoenix-2 use?\" The agent decides retrieval is needed, queries the "
+        "corpus, judges the first pass too thin on engine detail, reformulates the query, retrieves "
+        "again, then answers \"methalox\". Retrieval as a decision, not a reflex."),
+    "CorrectiveRAG": (
+        "Ask about something NOT in the index: grade marks every retrieved chunk irrelevant, and that "
+        "verdict triggers the corrective fallback (query rewrite / web search) instead of letting the "
+        "model hallucinate an answer from bad chunks."),
+    "SelfRAG": (
+        "For each retrieved passage it emits reflection tokens: retrieve? yes → relevant? passage A yes, "
+        "passage B no → supported? only claims backed by A survive. You can point at exactly which "
+        "sentence came from which passage."),
+    "AdaptiveRAG": (
+        "\"What does RAG stand for?\" → classified simple → answered directly, zero retrievals, seconds. "
+        "\"Which engine did the founder's second company build?\" → complex → multi-step retrieval. "
+        "Spend follows difficulty instead of every query paying the maximum."),
+    "GraphRAG": (
+        "\"What are the main themes across these documents?\" — chunk-RAG can't see across chunks, but "
+        "GraphRAG answers from its community summaries (the launch program, the leadership circle, the "
+        "facilities cluster). A local question instead walks one entity's neighbourhood. Open the "
+        "Knowledge graph below to see the communities."),
+    "Debate": (
+        "\"Will AI agents replace SaaS dashboards?\" Two agents argue opposite sides across two rounds — "
+        "that's the round self-loop in the graph — then vote settles it. Positions sharpen under "
+        "cross-examination, and single-model bias gets stress-tested."),
+    "Voyager": (
+        "\"Compute the 10th Fibonacci number.\" It writes fibonacci(), actually executes it in a "
+        "subprocess, and stores the working skill in its library. The next numeric task retrieves and "
+        "composes it instead of re-deriving from scratch. The real code is in the Workspace below."),
+    "STORM": (
+        "\"Write an article on agentic AI.\" perspectives spawns a technical, a social, and a historical "
+        "persona; questions has each interview the topic; answer grounds them; outline organizes; write "
+        "produces the article. Balance by construction, not by luck."),
+    "MemGPT": (
+        "A 200-turn support chat: older turns page out to archival storage while the core tier keeps the "
+        "account context. When the user mentions \"that invoice issue from last month\", the agent pages "
+        "the relevant memory back in — the context window stops being the ceiling."),
+    "ConstitutionalAI": (
+        "House rules: \"no superlatives without evidence; never bash competitors.\" The draft says "
+        "\"the best tool ever\" → critique fails exactly rule 1 → revise fixes exactly that sentence. "
+        "Policy enforcement you can audit rule-by-rule."),
+    "SWEAgent": (
+        "\"A test in this sandbox fails.\" It lists files, reads factorial.py, spots the missing base "
+        "case, writes the fix, and calls run_check to execute the tests — the PASS comes from running "
+        "the code, not from claiming success."),
+    "ComputerUse": (
+        "\"Log into the portal\" on a mock screen: observe the fields → choose type(username) → the "
+        "deterministic safety gate checks the domain → click(submit) → observe again. The strict "
+        "observe→act→gate loop, safe to study without a real browser."),
+    "BrowserAgent": (
+        "\"What's the main heading on example.com?\" Real Chromium navigates, the domain blocklist "
+        "clears the URL, it extracts the page text and answers \"Example Domain\". Point it at the "
+        "blocked phishing domain instead and the same graph refuses — try it."),
+    "AgentWorkflowMemory": (
+        "Solve the florist word-problem once — extract mines a \"day-by-day arithmetic\" recipe into the "
+        "library. Hand it the bakery version and retrieve pulls that recipe as a prior: same shape, "
+        "solved faster. The metadata even proves it: used_retrieved_workflow = True."),
+}
+
 CATALOG = {}
 for cls_name, num, fam, pattern, ref, task_key, needs in CATALOG_ROWS:
     prompt, spec = T[task_key]
@@ -397,6 +554,7 @@ for cls_name, num, fam, pattern, ref, task_key, needs in CATALOG_ROWS:
         "expected_fail": EXPECTED_FAIL.get(cls_name),
         "explain": EXPLAIN.get(cls_name, ("", ""))[0],
         "use_when": EXPLAIN.get(cls_name, ("", ""))[1],
+        "example": EXAMPLES.get(cls_name, ""),
         "checks": {"contains": spec.get("contains", []), "excludes": spec.get("excludes", []),
                    "metadata": spec.get("metadata", {})},
     }

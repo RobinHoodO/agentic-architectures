@@ -95,6 +95,9 @@ function openDrawer(cls) {
   $("d-ref").textContent = a.reference;
   $("d-explain").textContent = a.explain || "";
   $("d-usewhen").innerHTML = a.use_when ? `<b>Use it for:</b> ${esc(a.use_when)}` : "";
+  $("d-example").textContent = a.example || "";
+  $("d-exwrap").style.display = a.example ? "" : "none";
+  $("d-exwrap").removeAttribute("open");
   $("explainbox").style.display = a.explain ? "" : "none";
   $("task").value = a.task;
   $("runstate").textContent = a.setup_prompts.length
