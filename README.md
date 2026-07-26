@@ -4,7 +4,15 @@
 
 Click a pattern → read a plain-English explainer of what it actually does → hit RUN → watch its **real LangGraph light up node-by-node** while every LLM call streams into a live feed → click any node to inspect the exact prompts and responses → see the knowledge graph or shared workspace the agents built.
 
-Built by [The AI Automators](https://www.theaiautomators.com/) for our video on the agentic design-pattern canon. The pattern implementations come from [**FareedKhan-dev/all-agentic-architectures**](https://github.com/FareedKhan-dev/all-agentic-architectures) — this repo is a teaching harness around that excellent library (see [How this uses the base repo](#how-this-uses-the-base-repo)).
+## 📺 The video this was built for
+
+[![Learn Every AI Agent Pattern From One Video (I Actually Ran All 35)](https://img.youtube.com/vi/PZsJfBVDZZc/maxresdefault.jpg)](https://www.youtube.com/watch?v=PZsJfBVDZZc)
+
+**▶ [Learn Every AI Agent Pattern From One Video (I Actually Ran All 35)](https://www.youtube.com/watch?v=PZsJfBVDZZc)** — [The AI Automators](https://www.youtube.com/@TheAiAutomators) · 36 min
+
+This repo was created as part of that video. In it we walk all 35 patterns across 8 families, and every single one runs **live on screen in this Arena** — real model calls, real LangGraph topologies lighting up node by node — so you can watch the shape of each architecture execute instead of just reading about it. Everything you see in the video is in here; install it below and run the same patterns yourself.
+
+Built by [The AI Automators](https://www.theaiautomators.com/). The pattern implementations come from [**FareedKhan-dev/all-agentic-architectures**](https://github.com/FareedKhan-dev/all-agentic-architectures) — this repo is a teaching harness around that excellent library (see [How this uses the base repo](#how-this-uses-the-base-repo)).
 
 ![The Arena board — all 35 patterns swept green on a ChatGPT subscription](docs/arena-board.png)
 
