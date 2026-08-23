@@ -4,6 +4,16 @@ set -e
 cd "$(dirname "$0")"
 PORT="${ARENA_PORT:-8035}"
 
+# OpenRouter key for embeddings (shim falls back to local Ollama if absent)
+if [ -z "$OPENROUTER_API" ] && [ -f "/Users/robinsverd/Thrivbe-AI/Thrivbe-OS/.env" ]; then
+    export "$(grep -m1 '^OPENROUTER_API=' /Users/robinsverd/Thrivbe-AI/Thrivbe-OS/.env)"
+fi
+if [ -n "$OPENROUTER_API" ]; then
+    # route the arena library's embeddings through the shim → OpenRouter (not Ollama)
+    export EMBEDDINGS_PROVIDER=openai
+    export EMBEDDINGS_MODEL=text-embedding-3-small
+fi
+
 if [ ! -x ".venv/bin/python" ]; then
     echo "[arena] No .venv found - run setup first:   python3 setup.py"
     exit 1

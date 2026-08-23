@@ -52,7 +52,12 @@ DEFAULT_MODEL = os.environ.get("ARENA_CODEX_MODEL", "gpt-5.3-codex-spark")
 DEFAULT_EFFORT = os.environ.get("ARENA_CODEX_EFFORT", "low")
 TIMEOUT_S = float(os.environ.get("ARENA_CODEX_TIMEOUT", "300"))
 OLLAMA_URL = os.environ.get("ARENA_OLLAMA_URL", "http://localhost:11434")
-EMBED_MODEL = os.environ.get("ARENA_EMBED_MODEL", "nomic-embed-text")
+OPENROUTER_KEY = os.environ.get("ARENA_EMBED_KEY") or os.environ.get("OPENROUTER_API", "")
+# ponytail: OpenRouter when a key is present, Ollama otherwise — no separate provider flag
+EMBED_MODEL = os.environ.get(
+    "ARENA_EMBED_MODEL",
+    "openai/text-embedding-3-small" if OPENROUTER_KEY else "nomic-embed-text",
+)
 
 _sem = asyncio.Semaphore(int(os.environ.get("ARENA_CODEX_CONCURRENCY", "4")))
 
@@ -421,7 +426,8 @@ async def chat_completions(request: Request):
 
 
 # ---------------------------------------------------------------------------
-# /v1/embeddings  (Ollama passthrough — local, free)
+# /v1/embeddings  (OpenRouter when OPENROUTER_API/ARENA_EMBED_KEY is set,
+# else local Ollama passthrough)
 # ---------------------------------------------------------------------------
 
 @router.post("/v1/embeddings")
@@ -430,15 +436,31 @@ async def embeddings(request: Request):
     inputs = body.get("input", [])
     if isinstance(inputs, str):
         inputs = [inputs]
+    if inputs and isinstance(inputs[0], list):
+        # langchain's OpenAIEmbeddings pre-tokenizes; decode back to text
+        import tiktoken
+        enc = tiktoken.get_encoding("cl100k_base")
+        inputs = [enc.decode(t) for t in inputs]
     async with httpx.AsyncClient(timeout=120) as client:
-        r = await client.post(f"{OLLAMA_URL}/api/embed",
-                              json={"model": EMBED_MODEL, "input": inputs})
-        r.raise_for_status()
-        vectors = r.json().get("embeddings", [])
+        if OPENROUTER_KEY:
+            r = await client.post(
+                "https://openrouter.ai/api/v1/embeddings",
+                headers={"Authorization": f"Bearer {OPENROUTER_KEY}"},
+                json={"model": EMBED_MODEL, "input": inputs},
+            )
+            r.raise_for_status()
+            vectors = [d["embedding"] for d in r.json().get("data", [])]
+            provider = "openrouter"
+        else:
+            r = await client.post(f"{OLLAMA_URL}/api/embed",
+                                  json={"model": EMBED_MODEL, "input": inputs})
+            r.raise_for_status()
+            vectors = r.json().get("embeddings", [])
+            provider = "ollama"
     return JSONResponse({
         "object": "list",
         "data": [{"object": "embedding", "index": i, "embedding": v} for i, v in enumerate(vectors)],
-        "model": f"ollama/{EMBED_MODEL}",
+        "model": f"{provider}/{EMBED_MODEL}",
         "usage": {"prompt_tokens": 0, "total_tokens": 0},
     })
 
